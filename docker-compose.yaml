@@ -1,0 +1,14 @@
+services:
+  consumer:
+    build: .
+    environment:
+      SERVER_ENDPOINT: "http://producer:8080"
+    command: client
+    depends_on:
+      - producer
+  
+  producer:
+    build: .
+    ports:
+      - 8080:8080
+    command: server
