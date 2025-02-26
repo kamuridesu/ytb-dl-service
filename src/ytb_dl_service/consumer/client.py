@@ -11,8 +11,8 @@ handlers = EventsHandlers()
 
 def longer_than_10_minutes(info, *, incomplete):
     duration = info.get('duration')
-    if duration and duration < 600:
-        return 'The video is too short'
+    if duration and duration > 600:
+        return 'The video is too long'
 
 
 ytdl_opts = {
