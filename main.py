@@ -1,5 +1,5 @@
-import sys
 import asyncio
+import sys
 
 from src.ytb_dl_service.consumer.client import main as client
 from src.ytb_dl_service.producer.server import main as server

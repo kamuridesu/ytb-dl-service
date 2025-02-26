@@ -381,14 +381,14 @@ wheels = [
 
 [[package]]
 name = "shimarin"
-version = "0.3.3"
+version = "0.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2b/28/1320358f7a30bf91c9d6d184e984f9766f862d9348d58b06dcd8d950cb89/shimarin-0.3.3.tar.gz", hash = "sha256:345a29280a7011d14e8566d4082f95aa9f97d2d5c2a8ca19dec4561bb5591674", size = 20620 }
+sdist = { url = "https://files.pythonhosted.org/packages/2b/a3/f26de55b1c51e9e30bc658fdd6adeec7da735a201f7bc86c44dfc417025e/shimarin-0.3.4.tar.gz", hash = "sha256:a5f1469d18701da5c243f091428e3a659fa9e054cd12f14296ce25f0e3ccf77c", size = 20774 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/a0/7485b1cfacd6d24598dc945361b1e70978fa673bbbe82f739dd479b279f5/shimarin-0.3.3-py2.py3-none-any.whl", hash = "sha256:3102faca0d4728e6a6c5b601e439239bb0a3e1a5ae1de046d000cd8c761beb0d", size = 11655 },
+    { url = "https://files.pythonhosted.org/packages/12/1d/11d6f650b87e5b7d1a772fa85fa3c470745d5c8d0637bbacd9dc8a11f7a1/shimarin-0.3.4-py2.py3-none-any.whl", hash = "sha256:e8b829b0c3f4e2f2cf971f663f602bd671271e6b6759ba827119a60a8ae2269e", size = 11803 },
 ]
 
 [package.optional-dependencies]
@@ -510,7 +510,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "hypercorn", specifier = ">=0.17.3" },
-    { name = "shimarin", extras = ["flask"], specifier = "==0.3.3" },
+    { name = "shimarin", extras = ["flask"], specifier = "==0.3.4" },
     { name = "uvloop", specifier = ">=0.21.0" },
     { name = "yt-dlp", specifier = ">=2025.2.19" },
 ]

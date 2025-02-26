@@ -48,7 +48,7 @@ priority==2.0.0
     # via hypercorn
 propcache==0.3.0
     # via yarl
-shimarin==0.3.3
+shimarin==0.3.4
     # via ytb-dl-service (pyproject.toml)
 uvloop==0.21.0
     # via ytb-dl-service (pyproject.toml)
