@@ -3,11 +3,8 @@ import json
 import os
 
 import aiohttp
-import uvloop
 from Shimarin.client.events import Event, EventPolling, EventsHandlers
 from yt_dlp import YoutubeDL
-
-uvloop.install()
 
 handlers = EventsHandlers()
 
@@ -40,7 +37,8 @@ async def new_url(event: Event):
                     vb = f.read()
                 os.remove(filepath)
                 return await event.reply(vb, metadata={"filename": "video.mp4"})
-        except Exception:
+        except Exception as e:
+            print(str(e))
             return await event.reply(json.dumps({"msg": "Could not download video"}), metadata={"error": "1"})
 
 
