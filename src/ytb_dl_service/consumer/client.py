@@ -33,10 +33,11 @@ async def new_url(event: Event):
             with YoutubeDL(ytdl_opts) as ytdl:
                 info = ytdl.extract_info(url, download=True)
                 filepath = ytdl.prepare_filename(info)
+                print(f"Filename is {filepath}")
                 with open(filepath, "rb") as f:
                     vb = f.read()
                 os.remove(filepath)
-                return await event.reply(vb, metadata={"filename": "video.mp4"})
+                return await event.reply(vb, metadata={"filename": os.path.basename(filepath)})
         except Exception as e:
             print(str(e))
             return await event.reply(json.dumps({"msg": "Could not download video"}), metadata={"error": "1"})

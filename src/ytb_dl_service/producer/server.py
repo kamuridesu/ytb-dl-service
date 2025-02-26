@@ -4,7 +4,7 @@ from io import BytesIO
 
 import hypercorn
 import hypercorn.asyncio
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, Response, jsonify, request, send_file
 from Shimarin.plugins.flask_api import CONTEXT_PATH, ShimaApp
 from Shimarin.server.events import (
     CallbackArguments,
@@ -28,11 +28,14 @@ async def callback(params: CallbackArguments, metadata: CallbackMetadata):
             return jsonify(json.loads(params.__getattribute__("decode")())), 500
         filename = metadata.get(filename, filename)
     if isinstance(params, bytes):
+        if params is None:
+            return jsonify({"msg": "Received NONE from consumer"}), 500
+        print("Sending response file")
         return send_file(BytesIO(params), as_attachment=True, download_name=filename), 200
     return jsonify({"msg": "fail to handle bytes"}), 500
 
 
-async def handler(url: str):
+async def handler(url: str) -> tuple[Response, int]:
     event = Event("new_url", url, callback)
     await emitter.send(event)
     try:
