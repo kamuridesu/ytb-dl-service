@@ -9,7 +9,7 @@ from yt_dlp import YoutubeDL
 handlers = EventsHandlers()
 
 
-def longer_than_10_minutes(info, *, _):
+def longer_than_10_minutes(info, *, incomplete):
     duration = info.get('duration')
     if duration and duration < 600:
         return 'The video is too short'
