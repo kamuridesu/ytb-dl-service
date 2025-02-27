@@ -26,7 +26,7 @@ async def callback(params: CallbackArguments, metadata: CallbackMetadata):
     if metadata:
         if (metadata.get("error")):
             return jsonify(json.loads(params.__getattribute__("decode")())), 500
-        filename = metadata.get(filename, filename)
+        filename = metadata.get("filename", filename)
     if isinstance(params, bytes):
         if params is None:
             return jsonify({"msg": "Received NONE from consumer"}), 500

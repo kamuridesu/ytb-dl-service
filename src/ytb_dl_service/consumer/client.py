@@ -21,7 +21,6 @@ ytdl_opts = {
     "outtmpl": "%(title)s.%(ext)s"
 }
 
-
 @handlers.new("new_url")
 async def new_url(event: Event):
     async with aiohttp.ClientSession() as s:
@@ -35,10 +34,12 @@ async def new_url(event: Event):
                 filepath = ytdl.prepare_filename(info)
                 print(f"Filename is {filepath}")
                 with open(filepath, "rb") as f:
-                    vb = f.read()
+                    await event.reply(f, metadata={"filename": os.path.basename(filepath)})
                 os.remove(filepath)
-                return await event.reply(vb, metadata={"filename": os.path.basename(filepath)})
+                return
         except Exception as e:
+            print(str(e.__class__))
+            print(str(e.__cause__))
             print(str(e))
             return await event.reply(json.dumps({"msg": "Could not download video"}), metadata={"error": "1"})
 
