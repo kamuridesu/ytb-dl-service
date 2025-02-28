@@ -1,6 +1,8 @@
 services:
   consumer:
-    build: .
+    build: 
+      dockerfile: Dockerfile.consumer
+      context: .
     environment:
       SERVER_ENDPOINT: "http://producer:8080"
     command: client
@@ -8,7 +10,9 @@ services:
       - producer
   
   producer:
-    build: .
+    build:
+      dockerfile: Dockerfile.producer
+      context: .
     ports:
       - 8080:8080
     command: server

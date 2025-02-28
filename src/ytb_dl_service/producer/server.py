@@ -1,6 +1,7 @@
 import asyncio
 import json
 from io import BytesIO
+from typing import Literal
 
 import hypercorn
 import hypercorn.asyncio
@@ -35,8 +36,8 @@ async def callback(params: CallbackArguments, metadata: CallbackMetadata):
     return jsonify({"msg": "fail to handle bytes"}), 500
 
 
-async def handler(url: str) -> tuple[Response, int]:
-    event = Event("new_url", url, callback)
+async def handler(url: str, kind: Literal["audio","video"] = "video") -> tuple[Response, int]:
+    event = Event("new_url", json.dumps({"url": url, "kind": kind}), callback)
     await emitter.send(event)
     try:
         return (await emitter.get_answer(event.identifier, timeout=30))
@@ -54,7 +55,10 @@ async def index():
     args = request.args.get("url")
     if not args or not is_valid_url(args):
         return jsonify({"msg": "url is invalid"}), 400
-    re = await handler(args)
+    kind = request.args.get("kind", "video").lower()
+    if kind not in ["video", "audio"]:
+        return jsonify({"msg": f"format {kind} is invalid, expected video or audio"}), 400
+    re = await handler(args, kind)
     return re
 
 

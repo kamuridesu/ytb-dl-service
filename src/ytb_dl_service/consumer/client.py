@@ -1,6 +1,8 @@
 import asyncio
 import json
 import os
+from pathlib import Path
+from typing import Any, Literal
 
 import aiohttp
 from Shimarin.client.events import Event, EventPolling, EventsHandlers
@@ -15,11 +17,32 @@ def longer_than_10_minutes(info, *, incomplete):
         return 'The video is too long'
 
 
-ytdl_opts = {
+video_opts = {
     "match_filter": longer_than_10_minutes,
     "format": "best[height<=480]",
     "outtmpl": "%(title)s.%(ext)s"
 }
+
+audio_opts = {
+    "match_filter": longer_than_10_minutes,
+    'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'opus',
+    }],
+    'outtmpl': "%(title)s.%(ext)s",
+}
+
+
+async def reply(opts: dict[str, Any], url: str, event: Event):
+    with YoutubeDL(opts) as ytdl:
+        info = ytdl.extract_info(url, download=True)
+        filepath = filepath = info['requested_downloads'][0]['filepath']
+        with open(filepath, "rb") as f:
+            await event.reply(f, metadata={"filename": os.path.basename(filepath)})
+        Path(filepath).unlink(True)
+        return
+
 
 @handlers.new("new_url")
 async def new_url(event: Event):
@@ -27,16 +50,13 @@ async def new_url(event: Event):
         event.__session = s
         if event.payload is None:
             return await event.reply(json.dumps({"msg": "Invalid URL"}), metadata={"error": "1"})
-        url = event.payload
+        payload: dict[str, str] = json.loads(event.payload)
+        url = payload["url"]
+        kind: Literal["audio", "video"] = payload["kind"]
         try:
-            with YoutubeDL(ytdl_opts) as ytdl:
-                info = ytdl.extract_info(url, download=True)
-                filepath = ytdl.prepare_filename(info)
-                print(f"Filename is {filepath}")
-                with open(filepath, "rb") as f:
-                    await event.reply(f, metadata={"filename": os.path.basename(filepath)})
-                os.remove(filepath)
-                return
+            if kind == "audio":
+                return await reply(audio_opts, url, event)
+            return await reply(video_opts, url, event)
         except Exception as e:
             print(str(e.__class__))
             print(str(e.__cause__))
