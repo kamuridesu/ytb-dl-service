@@ -1,18 +1,22 @@
 services:
   consumer:
-    build: 
+    build:
       dockerfile: Dockerfile.consumer
       context: .
     environment:
-      SERVER_ENDPOINT: "http://producer:8080"
+      SERVER_ENDPOINT: "http://api.kamuridesu.com/api/ytdl"
     command: client
-    depends_on:
-      - producer
-  
-  producer:
+  consumer1:
     build:
-      dockerfile: Dockerfile.producer
+      dockerfile: Dockerfile.consumer
       context: .
-    ports:
-      - 8080:8080
-    command: server
+    environment:
+      SERVER_ENDPOINT: "http://api.kamuridesu.com/api/ytdl"
+    command: client
+#  producer:
+#    build:
+#      dockerfile: Dockerfile.producer
+#      context: .
+#    ports:
+#      - 8080:8080
+#    command: server

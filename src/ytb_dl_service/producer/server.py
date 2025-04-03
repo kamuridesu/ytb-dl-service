@@ -25,22 +25,25 @@ app.register_blueprint(ShimaApp(emitter, use_stream_response=False))
 async def callback(params: CallbackArguments, metadata: CallbackMetadata):
     filename = "unknown.mp4"
     if metadata:
-        if (metadata.get("error")):
+        if metadata.get("error"):
             return jsonify(json.loads(params.__getattribute__("decode")())), 500
         filename = metadata.get("filename", filename)
     if isinstance(params, bytes):
-        if params is None:
-            return jsonify({"msg": "Received NONE from consumer"}), 500
         print("Sending response file")
-        return send_file(BytesIO(params), as_attachment=True, download_name=filename), 200
+        return (
+            send_file(BytesIO(params), as_attachment=True, download_name=filename),
+            200,
+        )
     return jsonify({"msg": "fail to handle bytes"}), 500
 
 
-async def handler(url: str, kind: Literal["audio","video"] = "video") -> tuple[Response, int]:
+async def handler(
+    url: str, kind: Literal["audio", "video"] = "video"
+) -> tuple[Response, int]:
     event = Event("new_url", json.dumps({"url": url, "kind": kind}), callback)
     await emitter.send(event)
     try:
-        return (await emitter.get_answer(event.identifier, timeout=30))
+        return await emitter.get_answer(event.identifier, timeout=60)
     except EventAnswerTimeoutError:
         return jsonify({"msg": "fail to handle request"}), 500
 
@@ -57,7 +60,10 @@ async def index():
         return jsonify({"msg": "url is invalid"}), 400
     kind = request.args.get("kind", "video").lower()
     if kind not in ["video", "audio"]:
-        return jsonify({"msg": f"format {kind} is invalid, expected video or audio"}), 400
+        return (
+            jsonify({"msg": f"format {kind} is invalid, expected video or audio"}),
+            400,
+        )
     re = await handler(args, kind)
     return re
 
