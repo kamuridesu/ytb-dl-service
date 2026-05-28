@@ -12,19 +12,24 @@ jobs:
     steps:
       - name: Safely Fetch and Push PR Branch
         env:
-          FORGEJO_URL: ${{ secrets.FORGEJO_URL }}
+          FORGEJO_EXTERNAL_URL: ${{ secrets.FORGEJO_EXTERNAL_URL }}
           FORGEJO_USER: ${{ secrets.FORGEJO_USER }}
           FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
         run: |
           BRANCH_NAME="github-pr-${{ github.event.pull_request.number }}"
           git clone --bare https://github.com/${{ github.repository }}.git .
           git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-branch
-          git push "https://$FORGEJO_USER:$FORGEJO_TOKEN@${FORGEJO_URL#https://}/kamuridesu/ytb-dl-service.git" pr-branch:refs/heads/$BRANCH_NAME -f
+          
+          # Dynamically split the protocol (http/https) from the host
+          CLEAN_HOST="${{FORGEJO_EXTERNAL_URL#*://}}"
+          PROTOCOL="${{FORGEJO_EXTERNAL_URL%%://*}}"
+          
+          git push "$PROTOCOL://$FORGEJO_USER:$FORGEJO_TOKEN@$CLEAN_HOST/kamuridesu/ytb-dl-service.git" pr-branch:refs/heads/$BRANCH_NAME -f
 
       - name: Create PR on Forgejo via API
         if: github.event.action == 'labeled' && github.event.label.name == 'sync-to-forgejo'
         env:
-          FORGEJO_URL: ${{ secrets.FORGEJO_URL }}
+          FORGEJO_EXTERNAL_URL: ${{ secrets.FORGEJO_EXTERNAL_URL }}
           FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
           GH_PR_TITLE: ${{ github.event.pull_request.title }}
           GH_PR_BODY: ${{ github.event.pull_request.body }}
@@ -41,7 +46,7 @@ jobs:
             --arg base "main" \
             '{title: $title, body: $body, head: $head, base: $base}')
 
-          curl -X POST "$FORGEJO_URL/api/v1/repos/kamuridesu/ytb-dl-service/pulls" \
+          curl -X POST "$FORGEJO_EXTERNAL_URL/api/v1/repos/kamuridesu/ytb-dl-service/pulls" \
             -H "Content-Type: application/json" \
             -H "Authorization: token $FORGEJO_TOKEN" \
             -d "$JSON_PAYLOAD"
