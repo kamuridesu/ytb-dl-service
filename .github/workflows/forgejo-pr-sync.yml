@@ -1,9 +1,9 @@
 name: Secure Sync GitHub PR to Forgejo
-	
+
 	on:
 	  pull_request_target:
 	    types: [labeled, synchronize]
-	
+
 	jobs:
 	  sync-to-forgejo:
 	    if: contains(github.event.pull_request.labels.*.name, 'sync-to-forgejo')
